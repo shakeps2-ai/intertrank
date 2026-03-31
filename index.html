@@ -20,6 +20,7 @@
                     colors: {
                         navy: '#003B5C',
                         orange: '#F58220',
+                        deepNavy: '#001D2E',
                     },
                     animation: {
                         'slow-zoom': 'slow-zoom 30s linear infinite alternate',
@@ -78,40 +79,80 @@
             background: linear-gradient(135deg, rgba(0, 59, 92, 0.98) 0%, rgba(0, 29, 46, 1) 100%);
             backdrop-filter: blur(25px);
         }
+        
+        .gallery-item-hover:hover .gallery-overlay { opacity: 1; }
+        .gallery-overlay { transition: all 0.4s ease; }
     </style>
 </head>
 <body class="antialiased">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         const Icon = ({ name, size = 24, className = "" }) => {
-            useEffect(() => { if (window.lucide) { lucide.createIcons(); } }, [name]);
-            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
+            const iconRef = useRef(null);
+
+            useEffect(() => {
+                if (window.lucide && iconRef.current) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+
+            // Fallback para ícones de redes sociais que não existem no Lucide Core
+            const socialIcons = {
+                facebook: (
+                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                    </svg>
+                ),
+                instagram: (
+                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                    </svg>
+                ),
+                linkedin: (
+                    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+                    </svg>
+                )
+            };
+
+            if (socialIcons[name.toLowerCase()]) {
+                return socialIcons[name.toLowerCase()];
+            }
+
+            return (
+                <i 
+                    ref={iconRef}
+                    data-lucide={name} 
+                    className={className} 
+                    style={{ width: size, height: size, display: 'inline-block' }}
+                ></i>
+            );
         };
 
-        // --- CONFIGURAÇÃO CENTRALIZADA (RESTAURADA E COMPLETA) ---
+        // --- CONFIGURAÇÃO CENTRALIZADA ---
         const CONFIG_SITE = {
             whatsapp: {
-                numero: "5522981563336", // Apenas números, com DDD e 55
+                numero: "5522981563336",
                 mensagens: {
                     navbar: "Olá Intertrank! Gostaria de solicitar um teste VIP via site.",
                     hero: "Olá! Vi o site e quero solicitar um teste das soluções Intertrank.",
                     mobile_menu: "Olá! Quero uma demonstração VIP personalizada.",
                     planos_geral: "Olá! Gostaria de mais informações sobre os planos de monitoramento.",
-                    // Mensagens específicas por plano
                     plano_moto: "Olá! Tenho interesse no monitoramento para Moto.",
                     plano_carro: "Olá! Tenho interesse no monitoramento para Carro.",
                     plano_caminhao: "Olá! Gostaria de saber mais sobre a gestão para Caminhão.",
                     plano_celular: "Olá! Quero proteger meu aparelho com o Celular Safe.",
                     plano_pet: "Olá! Tenho interesse na Coleira Pet GPS.",
                     plano_black: "Olá! Quero a tecnologia máxima e gostaria de fazer um orçamento.",
+                    plano_agro: "Olá! Tenho interesse no Rastreio Agro e gostaria de montar um plano personalizado para minha operação.",
                     contato_modal: "Olá! Gostaria de uma Consultoria logística."
                 }
             },
             imagens: {
-                logo: "img/logo.png", // URL da logo (ex: "/img/logo.png")
+                logo: "img/logo.png",
                 logo_largura_nav: "40px",
                 logo_altura_nav: "40px",
                 logo_largura_footer: "50px",
@@ -121,6 +162,14 @@
                 hardware_metrics: "https://images.unsplash.com/photo-1551288049-bb1c003f07af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
                 video_thumbnail: "https://img.youtube.com/vi/fs6ndIHw4YY/maxresdefault.jpg"
             },
+            galeria: [
+                { type: 'image', url: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80', title: 'Operação Logística Portuária', desc: 'Monitoramento em tempo real de ativos pesados.' },
+                { type: 'image', url: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=80', title: 'Gestão de Frotas de Carga', desc: 'Telemetria avançada para redução de custos.' },
+                { type: 'video', videoId: 'fs6ndIHw4YY', title: 'Apresentação Institucional', desc: 'Conheça nossa tecnologia MDVR.', thumb: 'https://img.youtube.com/vi/fs6ndIHw4YY/maxresdefault.jpg' },
+                { type: 'image', url: 'https://images.unsplash.com/photo-1590674899484-d5640e854abe?auto=format&fit=crop&w=1200&q=80', title: 'Monitoramento Industrial', desc: 'Hardware blindado para condições extremas.' },
+                { type: 'image', url: 'https://images.unsplash.com/photo-1509017174183-0b7e0278f1ec?auto=format&fit=crop&w=1200&q=80', title: 'Segurança Executiva', desc: 'Soluções Black Line para veículos premium.' },
+                { type: 'video', videoId: 'dQw4w9WgXcQ', title: 'Treinamento de Equipes', desc: 'Suporte técnico especializado 24h.', thumb: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80' }
+            ],
             redes_sociais: {
                 linkedin: "https://www.linkedin.com/company/intertrank",
                 instagram: "https://www.instagram.com/intertrank",
@@ -134,6 +183,82 @@
         };
 
         // --- COMPONENTES DOS MODAIS ---
+
+        const ModalGradeGaleria = ({ isOpen, onClose, items, onSelectItem }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-8 overflow-y-auto">
+                    <div className="fixed inset-0 bg-deepNavy/95 backdrop-blur-xl transition-opacity" onClick={onClose}></div>
+                    <div className="relative bg-white rounded-[3rem] w-full max-w-7xl shadow-2xl overflow-hidden my-auto animate-fade-in border border-slate-100 flex flex-col max-h-[90vh]">
+                        <div className="p-8 md:p-12 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-20">
+                            <div className="text-left">
+                                <h2 className="text-navy text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Galeria Técnica</h2>
+                                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2 italic text-left">Portfólio de Operações Intertrank</p>
+                            </div>
+                            <button onClick={onClose} className="text-navy/20 hover:text-orange transition-all p-3">
+                                <Icon name="x" size={32} />
+                            </button>
+                        </div>
+                        <div className="p-8 md:p-12 overflow-y-auto">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {items.map((item, i) => (
+                                    <div 
+                                        key={i} 
+                                        onClick={() => onSelectItem(i)}
+                                        className="group relative aspect-square rounded-[2.5rem] overflow-hidden cursor-pointer gallery-item-hover border border-slate-100 shadow-md"
+                                    >
+                                        <img 
+                                            src={item.type === 'image' ? item.url : item.thumb} 
+                                            alt={item.title} 
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" 
+                                        />
+                                        <div className="absolute inset-0 bg-navy/60 opacity-0 gallery-overlay flex flex-col items-center justify-center p-6 text-center backdrop-blur-sm">
+                                            <div className="w-12 h-12 bg-orange rounded-2xl flex items-center justify-center text-navy mb-4 transform -translate-y-4 group-hover:translate-y-0 transition-transform">
+                                                <Icon name={item.type === 'image' ? 'maximize' : 'play'} size={24} />
+                                            </div>
+                                            <h4 className="text-white text-lg font-black uppercase italic tracking-tighter">{item.title}</h4>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ModalGaleriaLightbox = ({ isOpen, onClose, items, startIndex }) => {
+            const [currentIndex, setCurrentIndex] = useState(startIndex);
+            useEffect(() => { setCurrentIndex(startIndex); }, [startIndex]);
+            if (!isOpen) return null;
+
+            const next = () => setCurrentIndex((prev) => (prev + 1) % items.length);
+            const prev = () => setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
+            const currentItem = items[currentIndex];
+
+            return (
+                <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/98 backdrop-blur-3xl animate-fade-in">
+                    <button onClick={onClose} className="absolute top-8 right-8 text-white/50 hover:text-orange transition-all p-4 z-[2100]">
+                        <Icon name="x" size={40} />
+                    </button>
+                    <button onClick={prev} className="absolute left-4 md:left-10 text-white/20 hover:text-orange transition-all p-4 z-[2100] hidden sm:block"><Icon name="chevron-left" size={60} /></button>
+                    <button onClick={next} className="absolute right-4 md:right-10 text-white/20 hover:text-orange transition-all p-4 z-[2100] hidden sm:block"><Icon name="chevron-right" size={60} /></button>
+                    <div className="w-full max-w-6xl px-6 flex flex-col items-center">
+                        <div className="relative w-full aspect-video md:aspect-auto md:h-[75vh] rounded-[2rem] overflow-hidden shadow-2xl border border-white/10 bg-black flex items-center justify-center">
+                            {currentItem.type === 'image' ? (
+                                <img src={currentItem.url} alt={currentItem.title} className="w-full h-full object-contain" />
+                            ) : (
+                                <iframe className="w-full h-full" src={`https://www.youtube.com/embed/${currentItem.videoId}?autoplay=1`} frameBorder="0" allowFullScreen></iframe>
+                            )}
+                        </div>
+                        <div className="mt-8 text-center">
+                            <h3 className="text-white text-3xl font-black italic uppercase tracking-tighter">{currentItem.title}</h3>
+                            <p className="text-white/40 text-sm mt-2 font-bold uppercase tracking-widest">{currentItem.desc}</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         const ModalInformativo = ({ isOpen, onClose, title, content, icon }) => {
             if (!isOpen) return null;
@@ -152,12 +277,53 @@
                                 <h2 className="text-navy text-3xl md:text-5xl font-black tracking-tighter leading-tight text-center">{title}</h2>
                                 <div className="w-16 h-1.5 bg-orange rounded-full mt-6 mx-auto"></div>
                             </div>
-                            <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed">
+                            <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed text-left">
                                 {content}
                             </div>
                             <button onClick={onClose} className="mt-12 w-full bg-navy text-white py-5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-orange transition-all active:scale-95 shadow-xl">
                                 Entendido
                             </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ModalPlanos = ({ isOpen, onClose }) => {
+            if (!isOpen) return null;
+            const planos = [
+                { icon: "bike", name: "Moto", ads: "R$ 99,00", mensal: "R$ 49,90", features: ["Rastreio 24h", "Cerca Digital", "Alerta de Ignição"], key: "plano_moto" },
+                { icon: "car", name: "Carro", ads: "R$ 149,00", mensal: "R$ 69,90", features: ["Bloqueio via App", "Assistência 24h", "Histórico 1 ano"], key: "plano_carro" },
+                { icon: "truck", name: "Caminhão", ads: "R$ 199,00", mensal: "R$ 99,90", features: ["Gestão de Ativos", "Logística Avançada", "Check-in Entrega"], key: "plano_caminhao" },
+                { icon: "smartphone", name: "Celular Safe", ads: "GRÁTIS", mensal: "R$ 29,90", features: ["Localização Precisão", "Histórico de Trajeto", "Proteção de Dados"], key: "plano_celular" },
+                { icon: "dog", name: "Coleira Pet GPS", ads: "R$ 89,00", mensal: "R$ 39,90", features: ["Resistente IP67", "Alerta de Perímetro", "Bateria Longa"], key: "plano_pet" },
+                { icon: "award", name: "Black Premium", ads: "R$ 500,00", mensal: "R$ 199,90", features: ["Vídeo 4G Full HD", "Telemetria CAN Bus L2", "Gestão VIP 24h", "Até 4 Câmeras", "Solicite o Orçamento"], premium: true, key: "plano_black" },
+                { icon: "sprout", name: "Agro Custom", ads: "SOB MEDIDA", mensal: "SOB CONSULTA", features: ["Maquinário Pesado", "Controle de Safra", "Gestão de Diesel", "Horímetro Real-Time", "Monte seu Plano"], premium: true, key: "plano_agro" }
+            ];
+            return (
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-8 overflow-y-auto">
+                    <div className="fixed inset-0 bg-deepNavy/95 backdrop-blur-xl transition-opacity" onClick={onClose}></div>
+                    <div className="relative bg-white rounded-[3rem] w-full max-w-7xl shadow-2xl overflow-hidden my-auto animate-fade-in border border-slate-100">
+                        <button onClick={onClose} className="absolute top-8 right-8 text-navy/20 hover:text-orange transition-all p-3 z-30">
+                            <Icon name="x" size={32} />
+                        </button>
+                        <div className="p-8 md:p-12 lg:p-16 overflow-y-auto max-h-[90vh]">
+                            <h2 className="text-navy text-4xl md:text-6xl font-black tracking-tighter text-center mb-16 uppercase italic">Planos de Monitoramento</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {planos.map((p, i) => (
+                                    <div key={i} className={`p-8 rounded-[3rem] flex flex-col border transition-all duration-500 hover:-translate-y-2 ${p.premium ? 'bg-navy text-white shadow-2xl border-orange border-2 scale-105' : 'bg-slate-50 border-slate-100'}`}>
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-md mb-8 ${p.premium ? 'bg-orange text-navy' : 'bg-white text-orange'}`}>
+                                            <Icon name={p.icon} size={28} />
+                                        </div>
+                                        <h3 className="text-2xl font-black mb-2 text-left">{p.name}</h3>
+                                        <div className="text-4xl font-black italic mb-10 text-left">{p.mensal}<span className="text-xs opacity-40 ml-1">/mês</span></div>
+                                        <ul className="space-y-4 mb-12 flex-grow text-left">
+                                            {p.features.map((f, idx) => (<li key={idx} className="flex items-center gap-3 text-xs font-bold text-left"><Icon name="check" size={16} className="text-orange shrink-0" /> {f}</li>))}
+                                        </ul>
+                                        <a href={getWhatsAppLink(p.key)} target="_blank" className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-widest text-center transition-all shadow-lg ${p.premium ? 'bg-orange text-navy hover:bg-white' : 'bg-navy text-white hover:bg-orange'}`}>Assinar Agora</a>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -186,52 +352,15 @@
             );
         };
 
-        const ModalPlanos = ({ isOpen, onClose }) => {
-            if (!isOpen) return null;
-            const planos = [
-                { icon: "bike", name: "Moto", ads: "R$ 99,00", mensal: "R$ 49,90", features: ["Rastreio 24h", "Cerca Digital", "Alerta de Ignição"], key: "plano_moto" },
-                { icon: "car", name: "Carro", ads: "R$ 149,00", mensal: "R$ 69,90", features: ["Bloqueio via App", "Assistência 24h", "Histórico 1 ano"], key: "plano_carro" },
-                { icon: "truck", name: "Caminhão", ads: "R$ 199,00", mensal: "R$ 99,90", features: ["Gestão de Ativos", "Logística Avançada", "Check-in Entrega"], key: "plano_caminhao" },
-                { icon: "smartphone", name: "Celular Safe", ads: "GRÁTIS", mensal: "R$ 29,90", features: ["Localização Precisão", "Histórico de Trajeto", "Proteção de Dados"], key: "plano_celular" },
-                { icon: "dog", name: "Coleira Pet GPS", ads: "R$ 89,00", mensal: "R$ 39,90", features: ["Resistente IP67", "Alerta de Perímetro", "Bateria Longa"], key: "plano_pet" },
-                { icon: "award", name: "Black Premium", ads: "R$ 500,00", mensal: "R$ 199,90", features: ["Vídeo 4G Full HD", "Telemetria CAN Bus L2", "Gestão VIP 24h", "Até 4 Câmeras", "Solicite o Orçamento"], premium: true, key: "plano_black" }
-            ];
-            return (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-8 overflow-y-auto">
-                    <div className="fixed inset-0 bg-deepNavy/95 backdrop-blur-xl transition-opacity" onClick={onClose}></div>
-                    <div className="relative bg-white rounded-[3rem] w-full max-w-7xl shadow-2xl overflow-hidden my-auto animate-fade-in border border-slate-100">
-                        <button onClick={onClose} className="absolute top-8 right-8 text-navy/20 hover:text-orange transition-all p-3 z-30">
-                            <Icon name="x" size={32} />
-                        </button>
-                        <div className="p-8 md:p-12 lg:p-16 overflow-y-auto max-h-[90vh]">
-                            <h2 className="text-navy text-4xl md:text-6xl font-black tracking-tighter text-center mb-16 uppercase italic">Planos de Monitoramento</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {planos.map((p, i) => (
-                                    <div key={i} className={`p-8 rounded-[3rem] flex flex-col border transition-all duration-500 hover:-translate-y-2 ${p.premium ? 'bg-navy text-white shadow-2xl border-orange border-2 scale-105' : 'bg-slate-50 border-slate-100'}`}>
-                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-md mb-8 ${p.premium ? 'bg-orange text-navy' : 'bg-white text-orange'}`}>
-                                            <Icon name={p.icon} size={28} />
-                                        </div>
-                                        <h3 className="text-2xl font-black mb-2 text-left">{p.name}</h3>
-                                        <p className={`text-[10px] font-bold uppercase mb-8 text-left ${p.ads === 'GRÁTIS' ? 'text-orange font-black' : 'opacity-50'}`}>Adesão: {p.ads}</p>
-                                        <div className="text-4xl font-black italic mb-10 text-left">{p.mensal}<span className="text-xs opacity-40 ml-1">/mês</span></div>
-                                        <ul className="space-y-4 mb-12 flex-grow text-left">
-                                            {p.features.map((f, idx) => (<li key={idx} className="flex items-center gap-3 text-xs font-bold text-left"><Icon name="check" size={16} className="text-orange shrink-0" /> {f}</li>))}
-                                        </ul>
-                                        <a href={getWhatsAppLink(p.key)} target="_blank" className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-widest text-center transition-all shadow-lg ${p.premium ? 'bg-orange text-navy hover:bg-white' : 'bg-navy text-white hover:bg-orange'}`}>Assinar Agora</a>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
         const App = () => {
             const [isPlanosOpen, setIsPlanosOpen] = useState(false);
             const [isVideoOpen, setIsVideoOpen] = useState(false);
             const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
             const [infoModal, setInfoModal] = useState({ isOpen: false, title: "", content: null, icon: "info" });
+            
+            // Controle da Galeria
+            const [isGridGalleryOpen, setIsGridGalleryOpen] = useState(false);
+            const [lightboxState, setLightboxState] = useState({ isOpen: false, index: 0 });
 
             const openInfo = (type) => {
                 const data = {
@@ -239,8 +368,8 @@
                         title: "Engenharia Intertrank", icon: "users", 
                         content: (
                             <div className="space-y-6 text-left">
-                                <p className="text-lg font-medium text-navy text-left">Sobre a Intertrank: Inteligência em Movimento.</p>
-                                <p className="text-left">A Intertrank é uma empresa de tecnologia especializada em soluções avançadas de Vídeo Telemetria e Rastreamento Veicular. Nascida com o propósito de transformar a gestão de frotas, unimos hardware de alta performance e softwares inteligentes para entregar o que há de mais moderno em segurança, logística e controle operacional. Diferente do rastreamento convencional, a Intertrank foca na inteligência de dados. Através da nossa tecnologia de vídeo telemetria, oferecemos aos gestores uma visão em tempo real do que acontece dentro e fora dos veículos, permitindo a redução de custos, a prevenção de acidentes e o aumento imediato da produtividade. Sediada em Macaé/RJ, um dos principais polos operacionais do país, a Intertrank carrega em seu DNA o rigor técnico e a excelência no atendimento. Nosso compromisso com a ética e a transparência é sólido: operamos em total conformidade com a LGPD (Lei Geral de Proteção de Dados), garantindo que as informações de nossos clientes sejam tratadas com o máximo sigilo e segurança cibernética. Hoje, a Intertrank vive um momento de forte expansão. Além de nossa sede, estamos ampliando nossa presença nacional através da abertura de filiais e parcerias estratégicas. Acreditamos que a tecnologia de ponta deve ser acessível e acompanhada de um suporte local de qualidade. Seja você um gestor em busca de eficiência para sua frota, um profissional talentoso querendo transformar o setor, ou um empreendedor interessado em levar nossa marca para novas regiões, a Intertrank é o seu parceiro de confiança no caminho para o futuro.</p>
+                                <p className="text-lg font-medium text-navy text-left uppercase italic font-black">Sobre a Intertrank: Inteligência em Movimento.</p>
+                                <p className="text-left">A Intertrank é uma empresa de tecnologia especializada em soluções avançadas de Vídeo Telemetria e Rastreamento Veicular. Nascida com o propósito de transformar a gestão de frotas, unimos hardware de alta performance e softwares inteligentes para entregar o que há de mais moderno em segurança, logística e controle operacional. Diferente do rastreamento convencional, a Intertrank foca na inteligência de dados. Através da nossa tecnologia de vídeo telemetria, oferecemos aos gestores uma visão em tempo real do que acontece dentro e fora dos veículos, permitindo a redução de custos, a prevenção de acidentes e o aumento imediato da produtividade. Sediada em Macaé/RJ, um dos principais polos operacionais do país, a Intertrank carrega em seu DNA o rigor técnico e a excellence no atendimento. Nosso compromisso com a ética e a transparência é sólido: operamos em total conformidade com a LGPD (Lei Geral de Proteção de Dados), garantindo que as informações de nossos clientes sejam tratadas com o máximo sigilo e segurança cibernética. Hoje, a Intertrank vive um momento de forte expansão. Além de nossa sede, estamos ampliando nossa presença nacional através da abertura de filiais e parcerias estratégicas. Acreditamos que a tecnologia de ponta deve ser acessível e acompanhada de um suporte local de qualidade. Seja você um gestor em busca de eficiência para sua frota, um profissional talentoso querendo transformar o setor, ou um empreendedor interessado em levar nossa marca para novas regiões, a Intertrank é o seu parceiro de confiança no caminho para o futuro.</p>
                                 <div className="grid grid-cols-2 gap-6 mt-10">
                                     <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 text-center">
                                         <div className="text-5xl font-black text-navy leading-none">+50k</div>
@@ -269,43 +398,47 @@
                                         { t: "Monitoramento Pet GPS", d: "Coleiras inteligentes certificadas IP67 para localização exata de animais." }
                                     ].map((s, i) => (
                                         <div key={i} className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 hover:border-orange/40 transition-all">
-                                            <h4 className="font-black text-navy uppercase text-xs mb-3 tracking-widest flex items-center gap-3 text-left text-left"><div className="w-2 h-2 rounded-full bg-orange"></div> {s.t}</h4>
-                                            <p className="text-[11px] text-slate-500 leading-relaxed font-medium text-left text-left">{s.d}</p>
+                                            <h4 className="font-black text-navy uppercase text-xs mb-3 tracking-widest flex items-center gap-3 text-left"><div className="w-2 h-2 rounded-full bg-orange"></div> {s.t}</h4>
+                                            <p className="text-[11px] text-slate-500 leading-relaxed font-medium text-left">{s.d}</p>
                                         </div>
                                     ))}
                                 </div>
+                                <button 
+                                    onClick={() => { setInfoModal({isOpen: false}); setIsGridGalleryOpen(true); }} 
+                                    className="w-full bg-navy text-white py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl hover:bg-orange transition-all"
+                                > Ver Galeria Técnica de Operações </button>
                             </div>
                         )
                     },
-                    lgpd: {
-                        title: "Governança LGPD", icon: "shield-check",
+                    lgpd: { 
+                        title: "Governança LGPD", icon: "shield-check", 
                         content: (
                             <div className="space-y-6 text-sm text-slate-600 leading-relaxed text-left">
-                                <p className="font-black text-navy text-lg text-left">Compromisso de Privacidade e Proteção de Dados - Na Intertrank Vídeo Telemetria, a segurança não é apenas o que entregamos em nossos serviços, mas também como cuidamos das suas informações. Em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</p>
+                                <p className="font-black text-navy text-lg text-left italic">Compromisso de Privacidade e Proteção de Dados - Na Intertrank Vídeo Telemetria, a segurança não é apenas o que entregamos em nossos serviços, mas também como cuidamos das suas informações. Em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018)</p>
                                 <p className="text-left">1. O que coletamos e por quê? Para prestarmos nossos serviços de rastreamento e telemetria, tratamos dados como: Identificação: Nome, CPF/CNPJ e contato para gestão contratual e suporte. Localização e Telemetria: Dados gerados pelos dispositivos instalados nos veículos para fins de segurança patrimonial e gestão de frota. Imagens (Vídeo Telemetria): Quando aplicável, imagens de vídeo são processadas exclusivamente para monitoramento de segurança e análise de incidentes, conforme o contrato estabelecido.</p>
                                 <p className="text-left">2. Como protegemos seus dados? Utilizamos medidas técnicas e administrativas para impedir acessos não autorizados, vazamentos ou qualquer forma de tratamento inadequado. Seus dados são armazenados em ambientes seguros e com acesso restrito.</p>
                                 <p className="text-left">3. Com quem compartilhamos? A Intertrank não comercializa seus dados pessoais. O compartilhamento ocorre apenas com parceiros essenciais para a operação (ex: serviços de nuvem) ou por determinação legal/judicial, sempre seguindo padrões rigorosos de segurança.</p>
                                 <p className="text-left">4. Seus Direitos (LGPD) Você, como titular, tem o direito de: Confirmar se tratamos seus dados e acessá-los. Corrigir dados incompletos ou desatualizados. Solicitar a exclusão de dados (observando os prazos legais de guarda de documentos). Revogar o consentimento para comunicações de marketing.</p>
                                 <p className="text-left">5. Transparência Qualquer dúvida sobre como seus dados são geridos pela Intertrank pode ser enviada diretamente para o nosso canal de atendimento: contato@intertrank.com.br</p>
                             </div>
-                        )
+                        ) 
                     },
-                    privacidade: {
-                        title: "Privacidade de Dados", icon: "lock",
+                    privacidade: { 
+                        title: "Privacidade", icon: "lock", 
                         content: (
                             <div className="space-y-6 text-sm text-slate-600 leading-relaxed text-left">
-                                <p className="font-black text-navy text-lg text-left">Na Intertrank, entendemos que os dados de localização e as imagens de vídeo telemetria são ativos valiosos e sensíveis. Por isso, nossa gestão de dados é pautada por três pilares fundamentais:</p>
+                                <p className="font-black text-navy text-lg text-left italic">Na Intertrank, entendemos que os dados de localização e as imagens de vídeo telemetria são ativos valiosos e sensíveis. Por isso, nossa gestão de dados é pautada por três pilares fundamentais:</p>
                                 <p className="text-left">1. Coleta Consciente: Coletamos apenas as informações estritamente necessárias para a prestação dos nossos serviços de rastreamento e gestão de frotas. Isso inclui dados cadastrais para faturamento e dados técnicos dos veículos para monitoramento em tempo real.</p>
                                 <p className="text-left">2. Segurança Cibernética: Tratamos seus dados com o mesmo rigor que tratamos a segurança dos seus veículos: Criptografia: Os dados transmitidos entre os rastreadores e nossos servidores são protegidos. Acesso Restrito: Apenas profissionais autorizados da Intertrank e o próprio cliente possuem acesso às informações de telemetria e imagens. Servidores Seguros: Utilizamos infraestrutura de ponta para garantir a integridade e a disponibilidade dos dados 24h por dia.</p>
                                 <p className="text-left">3. Transparência Total (LGPD): Respeitamos integralmente a Lei Geral de Proteção de Dados (LGPD). Isso significa que: Seus dados são seus e nunca utilizaremos seus dados de localização ou imagens para fins diferentes daqueles contratados (segurança e logística). Não comercialização: A Intertrank jamais vende ou aluga bancos de dados de clientes para terceiros.</p>
                             </div>
-                        )
+                        ) 
                     },
-                    termos: {
-                        title: "Termos de Uso", icon: "file-text",
+                    termos: { 
+                        title: "Termos de Uso", icon: "file-text", 
                         content: (
                             <div className="space-y-6 text-sm text-slate-600 leading-relaxed text-left">
-                               <p className="font-black text-navy text-lg text-left">Termos e Condições de Uso - Intertrank Bem-vindo a Intertrank Vídeo Telemetria. Ao navegar em nosso portal ou contratar nossos serviços, você concorda com os termos abaixo descritos.</p>
+                               <p className="font-black text-navy text-lg text-left italic">Termos e Condições de Uso - Intertrank Bem-vindo a Intertrank Vídeo Telemetria. Ao navegar em nosso portal ou contratar nossos serviços, você concorda com os termos abaixo descritos.</p>
                                <p className="text-left">1. Objeto e Serviços: A Intertrank presta serviços de rastreamento veicular, monitoramento e vídeo telemetria. Este site tem como objetivo apresentar nossas soluções e oferecer suporte.</p>
                                <p className="text-left">2. Responsabilidades do Usuário: Fornecer informações verdadeiras, não utilizar o conteúdo para fins comerciais sem autorização e não tentar burlar sistemas de segurança.</p>
                                <p className="text-left">3. Propriedade Intelectual: Todo o conteúdo disponível neste site — incluindo a marca Intertrank, design, códigos e textos — é de propriedade exclusiva da empresa.</p>
@@ -314,58 +447,54 @@
                                <p className="text-left">6. Modificações nos Termos: Podemos alterar estes Termos de Uso a qualquer momento para refletir mudanças em nossos serviços ou na legislação.</p>
                                <p className="text-left">7. Foro e Legislação Aplicável: Estes termos são regidos pelas leis da República Federativa do Brasil. O foro eleito é o da Comarca do Rio de Janeiro.</p>
                             </div>
-                        )
+                        ) 
                     },
-                    etica: {
-                        title: "Canal de Ética", icon: "search",
+                    etica: { 
+                        title: "Canal de Ética", icon: "search", 
                         content: (
                             <div className="space-y-6 text-sm text-slate-600 leading-relaxed text-left">
-                                <p className="text-left text-left">A Intertrank preza pela transparência, honestidade e respeito em todas as suas relações. Disponibilizamos este canal exclusivo para a comunicação de condutas que não estejam de acordo com o nosso Código de Ética ou com a legislação vigente.</p>
-                                <p className="text-left text-left"><strong>O que deve ser relatado aqui?</strong> Este espaço deve ser utilizado para relatar situações como: Fraudes, desvios ou corrupção; Uso indevido de dados de monitoramento ou imagens; Assédio, discriminação ou condutas desrespeitosas; Descumprimento de normas de segurança.</p>
-                                <p className="text-left text-left"><strong>Garantias ao Relatante:</strong> 1. Anonimato: Você não precisa se identificar para fazer um relato. 2. Confidencialidade: Todas as informações serão tratadas com sigilo absoluto. 3. Não Retaliação: A Intertrank proíbe e não tolera qualquer forma de retaliação contra quem utiliza este canal de boa-fé.</p>
-                                <p className="text-left text-left"><strong>Como relatar?</strong> Envie seu relato para o e-mail: <strong>etica@intertrank.com.br</strong> ou preencha o formulário abaixo.</p>
+                                <p className="text-left italic font-bold">A Intertrank preza pela transparência, honestidade e respeito em todas as suas relações. Disponibilizamos este canal exclusivo para a comunicação de condutas que não estejam de acordo com o nosso Código de Ética ou com a legislação vigente.</p>
+                                <p className="text-left"><strong>O que deve ser relatado aqui?</strong> Este espaço deve ser utilizado para relatar situações como: Fraudes, desvios ou corrupção; Uso indevido de dados de monitoramento ou imagens; Assédio, discriminação ou condutas desrespeitosas; Descumprimento de normas de segurança.</p>
+                                <p className="text-left"><strong>Garantias ao Relatante:</strong> 1. Anonimato: Você não precisa se identificar para fazer um relato. 2. Confidencialidade: Todas as informações serão tratadas com sigilo absoluto. 3. Não Retaliação: A Intertrank proíbe e não tolera qualquer forma de retaliação contra quem utiliza este canal de boa-fé.</p>
+                                <p className="text-left"><strong>Como relatar?</strong> Envie seu relato para o e-mail: <strong>etica@intertrank.com.br</strong> ou preencha o formulário abaixo.</p>
                             </div>
-                        )
+                        ) 
                     },
-                    trabalhe: {
-                        title: "Trabalhe Conosco – Intertrank", icon: "briefcase",
+                    trabalhe: { 
+                        title: "Trabalhe Conosco", icon: "briefcase", 
                         content: (
                             <div className="text-center space-y-8">
-                                <p className="font-medium text-slate-600"><strong>Faça parte da nossa história!</strong></p>
-								 <p className="font-medium text-slate-600"><strong>Na Intertrank, estamos em plena expansão. Buscamos não apenas talentos para nossa sede em Macaé, mas também empreendedores e parceiros que queiram levar nossa tecnologia de vídeo telemetria para novas regiões.</strong></p>
-								 <p className="font-medium text-slate-600">Se você busca um ambiente dinâmico e tecnológico, candidate-se às nossas vagas nas áreas:</p>
-								  <p className="font-medium text-slate-600"><strong>Técnica:</strong> Instalação e manutenção de sistemas embarcados.</p>
-								   <p className="font-medium text-slate-600"><strong>Comercial:</strong> Consultoria de vendas B2B para frotas e logística.</p>
-								   <p className="font-medium text-slate-600"><strong>Operacional:</strong> Monitoramento e suporte em tempo real.</p>
-								   <p className="font-medium text-slate-600"><strong>2. Seja uma Filial Intertrank</strong></p>
-								   <p className="font-medium text-slate-600">Estamos selecionando parceiros estratégicos para a abertura de novas unidades. Se você tem perfil empreendedor e deseja atuar no setor de segurança e gestão de frotas com o suporte de uma marca consolidada, queremos falar com você!</p>
-								   <p className="font-medium text-slate-600"><strong>Como saber mais?</strong></p>
-								   <p className="font-medium text-slate-600">Interessado em abrir uma unidade da Intertrank na sua cidade ou região? Entre em contato conosco para receber o material informativo e agendar uma reunião com nossa diretoria de expansão.</p>
+                                <p className="font-medium text-slate-600"><strong>Faça parte da nossa história!</strong> Na Intertrank, estamos em plena expansão buscando talentos e parceiros para novas filiais.</p>
+                                <div className="space-y-4 text-left text-sm text-slate-500">
+                                    <p><strong>Técnica:</strong> Instalação e manutenção de sistemas embarcados.</p>
+                                    <p><strong>Comercial:</strong> Consultoria de vendas B2B para frotas e logística.</p>
+                                    <p><strong>Operacional:</strong> Monitoramento e suporte em tempo real.</p>
+                                </div>
                                 <div className="p-12 bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
                                     <Icon name="mail" className="mx-auto text-orange mb-6" size={48} />
                                     <p className="text-sm font-bold text-navy uppercase tracking-widest mb-2 text-center">Envie seu CV para:</p>
                                     <p className="font-black text-orange text-xl tracking-tighter uppercase text-center">talentos@intertrank.com.br</p>
                                 </div>
                             </div>
-                        )
+                        ) 
                     },
                     contato: {
                         title: "Consultoria VIP", icon: "phone",
                         content: (
                             <div className="space-y-8 text-left">
                                 <div className="bg-slate-50 p-8 rounded-[3rem] border border-slate-100">
-                                    <h4 className="text-navy font-black uppercase text-xs mb-8 tracking-widest text-center italic text-center">Solicitar Atendimento</h4>
+                                    <h4 className="text-navy font-black uppercase text-xs mb-8 tracking-widest text-center italic">Solicitar Atendimento Especializado</h4>
                                     <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); window.open(getWhatsAppLink('contato_modal'), '_blank'); }}>
                                         <input type="text" placeholder="Nome / Empresa" className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-xs font-bold text-navy outline-none" required />
                                         <input type="tel" placeholder="WhatsApp" className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-xs font-bold text-navy outline-none" required />
-                                        <textarea placeholder="Sua necessidade logística..." rows="3" className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-xs font-bold text-navy outline-none resize-none"></textarea>
-                                        <button type="submit" className="w-full bg-orange text-navy py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl active:scale-95 transition-all text-center text-center">Enviar via WhatsApp</button>
+                                        <textarea placeholder="Sua necessidade logística ou de segurança..." rows="3" className="w-full bg-white border border-slate-200 rounded-2xl px-5 py-4 text-xs font-bold text-navy outline-none resize-none"></textarea>
+                                        <button type="submit" className="w-full bg-orange text-navy py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl active:scale-95 transition-all text-center">Enviar via WhatsApp</button>
                                     </form>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <a href="tel:22 98156-3336" className="p-4 bg-white border border-slate-100 rounded-2xl flex items-center gap-3 text-left hover:border-orange transition-colors"><Icon name="phone-call" size={18} className="text-orange" /><span className="text-[9px] font-black text-navy uppercase text-left">22 98156-3336 - Fernando</span></a>
-                                    <a href="tel:21 96561-1884" className="p-4 bg-white border border-slate-100 rounded-2xl flex items-center gap-3 text-left hover:border-orange transition-colors"><Icon name="phone-call" size={18} className="text-orange" /><span className="text-[9px] font-black text-navy uppercase text-left">21 96561-1884 - Ramon</span></a>
-                                    <a href="mailto:contato@intertrank.com.br" className="p-4 bg-white border border-slate-100 rounded-2xl flex items-center gap-3 text-left hover:border-orange transition-colors"><Icon name="mail" size={18} className="text-orange" /><span className="text-[9px] font-black text-navy uppercase text-left">contato@intertrank.com.br</span></a>
+                                    <a href="tel:22981563336" className="p-4 bg-white border border-slate-100 rounded-2xl flex items-center gap-3 text-left hover:border-orange transition-colors"><Icon name="phone-call" size={18} className="text-orange" /><span className="text-[9px] font-black text-navy uppercase">22 98156-3336 - Fernando</span></a>
+                                    <a href="tel:21965611884" className="p-4 bg-white border border-slate-100 rounded-2xl flex items-center gap-3 text-left hover:border-orange transition-colors"><Icon name="phone-call" size={18} className="text-orange" /><span className="text-[9px] font-black text-navy uppercase">21 96561-1884 - Ramon</span></a>
+                                    <a href="mailto:contato@intertrank.com.br" className="p-4 bg-white border border-slate-100 rounded-2xl flex items-center gap-3 text-left hover:border-orange transition-colors"><Icon name="mail" size={18} className="text-orange" /><span className="text-[9px] font-black text-navy uppercase">contato@intertrank.com.br</span></a>
                                 </div>
                             </div>
                         )
@@ -377,14 +506,15 @@
             const handleNav = (name) => {
                 const key = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 if (key === 'inicio') window.scrollTo({ top: 0, behavior: 'smooth' });
+                else if (key === 'galeria') setIsGridGalleryOpen(true);
                 else openInfo(key);
                 setIsMobileMenuOpen(false);
             };
 
             useEffect(() => {
-                const isAnyModalOpen = isPlanosOpen || infoModal.isOpen || isVideoOpen || isMobileMenuOpen;
+                const isAnyModalOpen = isPlanosOpen || infoModal.isOpen || isVideoOpen || isMobileMenuOpen || isGridGalleryOpen || lightboxState.isOpen;
                 document.body.classList.toggle('no-scroll', isAnyModalOpen);
-            }, [isPlanosOpen, infoModal.isOpen, isVideoOpen, isMobileMenuOpen]);
+            }, [isPlanosOpen, infoModal.isOpen, isVideoOpen, isMobileMenuOpen, isGridGalleryOpen, lightboxState.isOpen]);
 
             return (
                 <div className="min-h-screen bg-white text-left overflow-x-hidden">
@@ -392,10 +522,7 @@
                     <nav className={`fixed top-0 w-full z-50 glass-nav py-4 shadow-sm transition-all duration-500 ${isMobileMenuOpen ? 'opacity-0' : 'opacity-100'}`}>
                         <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center text-left">
                             <div className="flex items-center gap-4 group cursor-pointer text-left" onClick={() => window.scrollTo(0,0)}>
-                                <div 
-                                    className="bg-navy rounded-2xl text-white transition-all group-hover:rotate-3 shadow-lg group-hover:bg-orange flex items-center justify-center overflow-hidden"
-                                    style={{ width: CONFIG_SITE.imagens.logo_largura_nav, height: CONFIG_SITE.imagens.logo_altura_nav }}
-                                >
+                                <div className="bg-navy rounded-2xl text-white shadow-lg flex items-center justify-center overflow-hidden" style={{ width: CONFIG_SITE.imagens.logo_largura_nav, height: CONFIG_SITE.imagens.logo_altura_nav }}>
                                     {CONFIG_SITE.imagens.logo ? <img src={CONFIG_SITE.imagens.logo} alt="Logo" className="w-full h-full object-contain" /> : <Icon name="camera" size={22} />}
                                 </div>
                                 <div className="flex flex-col leading-tight">
@@ -404,7 +531,7 @@
                                 </div>
                             </div>
                             <div className="hidden lg:flex items-center space-x-10 text-left">
-                                {['Início', 'Serviços', 'Sobre', 'Contato'].map(i => (
+                                {['Início', 'Serviços', 'Galeria', 'Sobre', 'Contato'].map(i => (
                                     <button key={i} onClick={() => handleNav(i)} className="text-[10px] font-black uppercase tracking-[0.3em] text-navy/60 hover:text-orange transition-all text-left">{i}</button>
                                 ))}
                                 <a href={getWhatsAppLink('navbar')} target="_blank" className="bg-orange text-navy px-10 py-3.5 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:bg-navy hover:text-white transition-all text-center">SOLICITAR TESTE VIP</a>
@@ -413,51 +540,51 @@
                         </div>
                     </nav>
 
-                    {/* PREMIUM MOBILE MENU */}
+                    {/* MOBILE MENU */}
                     <div className={`fixed inset-0 z-[1200] premium-menu transition-all duration-700 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                        <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-10 right-10 text-white/40 hover:text-white transition-all p-4 text-center"><Icon name="x" size={48} /></button>
+                        <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-10 right-10 text-white/40 hover:text-white transition-all p-4"><Icon name="x" size={48} /></button>
                         <div className="h-full flex flex-col items-center justify-center space-y-8 p-12 text-center">
-                            {['Início', 'Serviços', 'Premium', 'Sobre', 'Contato'].map(i => (
+                            {['Início', 'Serviços', 'Galeria', 'Sobre', 'Contato'].map(i => (
                                 <button key={i} onClick={() => handleNav(i)} className="text-white text-5xl font-black hover:text-orange transition-all tracking-tighter uppercase italic">{i}</button>
                             ))}
-                            <a href={getWhatsAppLink('mobile_menu')} target="_blank" className="w-full bg-orange text-navy py-7 rounded-[2.5rem] font-black text-sm uppercase tracking-[0.2em] shadow-2xl mt-12 active:scale-95 transition-all text-center">Demonstração VIP</a>
                         </div>
                     </div>
 
                     <main className="text-left">
                         {/* HERO SECTION */}
-                        <section id="home" className="relative min-h-screen flex flex-col bg-[#001D2E] overflow-hidden text-left">
-                            <div className="absolute inset-0 z-0 text-left"><div className="absolute inset-0 hero-gradient z-10 text-left"></div><img src={CONFIG_SITE.imagens.hero_bg} className="w-full h-full object-cover animate-slow-zoom opacity-60" /></div>
+                        <section id="home" className="relative min-h-screen flex flex-col bg-deepNavy overflow-hidden text-left">
+                            <div className="absolute inset-0 z-0"><div className="absolute inset-0 hero-gradient z-10"></div><img src={CONFIG_SITE.imagens.hero_bg} className="w-full h-full object-cover animate-slow-zoom opacity-60" /></div>
                             <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-12 w-full pt-44 lg:pt-64 pb-32 flex-grow flex flex-col justify-start">
                                 <div className="max-w-4xl p-10 md:p-16 glass-panel rounded-[3.5rem] md:rounded-[5rem] animate-fade-in text-left">
-                                    <div className="inline-flex items-center gap-3 bg-orange/10 border border-orange/20 text-orange px-6 py-2 rounded-full text-[10px] font-black uppercase mb-10 tracking-widest text-left"><Icon name="award" size={14} /> Engenharia em Monitoramento Industrial</div>
-                                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white leading-[0.9] tracking-tighter mb-10 text-left uppercase italic">Controle <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange to-white text-left">Total</span></h1>
-                                    <p className="text-lg md:text-2xl text-white/70 mb-14 max-w-2xl text-left leading-relaxed font-medium">Segurança inabalável com vídeo telemetria industrial de alta precisão para frotas, celulares e animais.</p>
-                                    <div className="flex flex-col sm:flex-row gap-6 text-left">
-                                        <a href={getWhatsAppLink('hero')} target="_blank" className="bg-orange text-navy px-14 py-6 rounded-3xl font-black text-base shadow-2xl flex items-center justify-center gap-4 hover:bg-white hover:scale-105 transition-all active:scale-95 text-center">Solicitar Teste <Icon name="arrow-right" size={24} /></a>
-                                        <button onClick={() => setIsPlanosOpen(true)} className="border-2 border-white/20 text-white px-14 py-6 rounded-3xl font-black text-base backdrop-blur-xl hover:bg-white/10 transition-all uppercase tracking-widest text-center">Ver Planos</button>
+                                    <div className="inline-flex items-center gap-3 bg-orange/10 border border-orange/20 text-orange px-6 py-2 rounded-full text-[10px] font-black uppercase mb-10 tracking-widest"><Icon name="award" size={14} /> Engenharia em Monitoramento Industrial</div>
+                                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white leading-[0.9] tracking-tighter mb-10 uppercase italic text-left">Controle <span className="text-orange text-left">Total</span></h1>
+                                    <p className="text-lg md:text-2xl text-white/70 mb-14 max-w-2xl leading-relaxed font-medium text-left">Segurança inabalável com vídeo telemetria industrial de alta precisão para frotas e ativos.</p>
+                                    <div className="flex flex-col sm:flex-row gap-6">
+                                        <a href={getWhatsAppLink('hero')} target="_blank" className="bg-orange text-navy px-14 py-6 rounded-3xl font-black text-base shadow-2xl flex items-center justify-center gap-4 hover:bg-white transition-all text-center">Solicitar Teste <Icon name="arrow-right" size={24} /></a>
+                                        <button onClick={() => setIsPlanosOpen(true)} className="border-2 border-white/20 text-white px-14 py-6 rounded-3xl font-black text-base backdrop-blur-xl hover:bg-white/10 transition-all uppercase tracking-widest">Ver Planos</button>
                                     </div>
                                 </div>
                             </div>
                         </section>
 
-                        {/* SEGMENTAÇÃO (4 CARDS) */}
+                        {/* SEGMENTAÇÃO (5 CARDS) */}
                         <section className="py-24 md:py-32 bg-slate-50 relative overflow-hidden text-left">
-                            <div className="max-w-7xl mx-auto px-6 lg:px-12 text-left">
-                                <div className="text-center mb-16 md:mb-20 text-center">
-                                    <span className="text-orange font-black tracking-[0.4em] uppercase text-[10px] mb-6 block italic text-center text-center">Ecossistema</span>
-                                    <h2 className="text-navy text-4xl md:text-6xl font-black tracking-tighter text-center leading-tight text-center">Soluções para cada Perfil.</h2>
+                            <div className="max-w-[1400px] mx-auto px-6 lg:px-12 text-left">
+                                <div className="text-center mb-16 md:mb-20">
+                                    <span className="text-orange font-black tracking-[0.4em] uppercase text-[10px] mb-6 block italic">Ecossistema</span>
+                                    <h2 className="text-navy text-4xl md:text-6xl font-black tracking-tighter leading-tight">Soluções para cada Perfil.</h2>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                                     {[
                                         { t: "Caminhão", d: "Gestão técnica de caminhões e ativos pesados com foco em ROI.", i: "truck" },
-                                        { t: "Carro/Moto", d: "Segurança de alto padrão para carros e motos com bloqueio instantâneo.", i: "car" },
-                                        { t: "Celular Safe", d: "Rastreio discreto e proteção total de dados para segurança pessoal.", i: "smartphone" },
-                                        { t: "Animais GPS", d: "Localização precisa de pets via coleiras inteligentes tecnologia IP67.", i: "dog" }
+                                        { t: "Rastreio Agro", d: "Tecnologia de precisão para maquinário agrícola e gestão de safra 24h.", i: "tractor" },
+                                        { t: "Carro/Moto", d: "Segurança de alto padrão com bloqueio instantâneo.", i: "car" },
+                                        { t: "Celular Safe", d: "Rastreio discreto e proteção total de dados pessoais.", i: "smartphone" },
+                                        { t: "Animais GPS", d: "Localização precisa via coleiras inteligentes IP67.", i: "dog" }
                                     ].map((s, i) => (
-                                        <div key={i} className="bg-white p-10 rounded-[3rem] border border-slate-100 group hover:bg-navy transition-all duration-500 text-left">
-                                            <div className="w-14 h-14 bg-orange/10 rounded-2xl flex items-center justify-center text-orange mb-8 group-hover:bg-orange group-hover:text-white transition-colors text-left"><Icon name={s.i} size={28} /></div>
-                                            <h3 className="text-navy group-hover:text-white text-2xl font-black mb-4 text-left">{s.t}</h3>
+                                        <div key={i} className="bg-white p-8 rounded-[3rem] border border-slate-100 group hover:bg-navy transition-all duration-500 shadow-sm hover:shadow-xl">
+                                            <div className="w-14 h-14 bg-orange/10 rounded-2xl flex items-center justify-center text-orange mb-8 group-hover:bg-orange group-hover:text-white transition-colors"><Icon name={s.i} size={28} /></div>
+                                            <h3 className="text-navy group-hover:text-white text-xl font-black mb-4 text-left italic uppercase">{s.t}</h3>
                                             <p className="text-slate-500 group-hover:text-white/60 text-[11px] leading-relaxed text-left">{s.d}</p>
                                         </div>
                                     ))}
@@ -465,79 +592,67 @@
                             </div>
                         </section>
 
-                        {/* SEÇÃO INTERTRANK BLACK (DETALHADA) */}
-                        <section id="black" className="py-24 md:py-32 bg-[#001D2E] text-white relative overflow-hidden text-left border-y border-white/5">
-                            <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10 text-left">
-                                <div className="flex flex-col lg:flex-row items-center gap-16 text-left">
-                                    <div className="lg:w-1/2 text-left">
-                                        <span className="text-orange font-black uppercase text-[10px] mb-6 block tracking-[0.5em] italic text-left">Linha Black Line Premium</span>
-                                        <h2 className="text-5xl md:text-7xl font-black mb-12 tracking-tighter leading-none text-left uppercase italic text-left">Intertrank <br/><span className="text-orange text-left">Black</span>.</h2>
-                                        <div className="space-y-8 text-left">
+                        {/* SEÇÃO BLACK */}
+                        <section id="black" className="py-24 md:py-32 bg-deepNavy text-white relative overflow-hidden text-left border-y border-white/5">
+                            <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+                                <div className="flex flex-col lg:flex-row items-center gap-16">
+                                    <div className="lg:w-1/2">
+                                        <span className="text-orange font-black uppercase text-[10px] mb-6 block tracking-[0.5em] italic">Black Line Premium</span>
+                                        <h2 className="text-5xl md:text-7xl font-black mb-12 tracking-tighter leading-none uppercase italic text-left">Intertrank <br/><span className="text-orange">Black</span>.</h2>
+                                        <div className="space-y-8">
                                             {[
-                                                { t: "MDVR 4G Integrado Pro", d: "Até 8 câmeras Full HD 1080p simultâneas com gravação redundante e backup em nuvem.", i: "video" },
-                                                { t: "Telemetria Porta CAN L2", d: "Leitura técnica profunda do motor e eletrónica para análise mecânica preventiva.", i: "activity" },
-                                                { t: "Hardware Militar Blindado", d: "Processadores Quad-Core industriais com certificação de choque e vibração.", i: "cpu" },
-                                                { t: "Sensores Periféricos", d: "Monitoramento de carga, portas certificados para logística industrial.", i: "shield-check" }
+                                                { t: "MDVR 4G Pro", d: "Até 8 câmeras Full HD simultâneas com backup em nuvem.", i: "video" },
+                                                { t: "Telemetria CAN", d: "Leitura técnica profunda do motor e eletrónica preventiva.", i: "activity" }
                                             ].map((item, idx) => (
-                                                <div key={idx} className="flex gap-6 text-left">
-                                                    <div className="shrink-0 w-14 h-14 rounded-2xl bg-orange flex items-center justify-center text-navy shadow-xl shadow-orange-500/20 text-left"><Icon name={item.i} size={24} className="text-left" /></div>
+                                                <div key={idx} className="flex gap-6">
+                                                    <div className="shrink-0 w-14 h-14 rounded-2xl bg-orange flex items-center justify-center text-navy shadow-xl"><Icon name={item.i} size={24} /></div>
                                                     <div className="text-left">
-                                                        <h4 className="text-xl font-black mb-1 text-left uppercase tracking-widest text-left">{item.t}</h4>
+                                                        <h4 className="text-xl font-black mb-1 uppercase tracking-widest text-left">{item.t}</h4>
                                                         <p className="text-white/40 text-[11px] leading-relaxed text-left">{item.d}</p>
                                                     </div>
                                                 </div>
                                             ))}
+                                            <button 
+                                                onClick={() => setIsGridGalleryOpen(true)} 
+                                                className="mt-8 border border-orange text-orange px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-orange hover:text-navy transition-all"
+                                            > Ver Portfólio Black </button>
                                         </div>
                                     </div>
-                                    <div className="lg:w-1/2 w-full mt-10 lg:mt-0 text-left">
-                                         <div className="relative p-2 bg-white/5 rounded-[3rem] border border-white/10 shadow-2xl text-left">
-                                            <img src={CONFIG_SITE.imagens.black_dash} alt="Dash Black" className="rounded-[2.5rem] opacity-90 w-full grayscale hover:grayscale-0 transition-all duration-1000 text-left" />
+                                    <div className="lg:w-1/2 w-full">
+                                         <div className="relative p-2 bg-white/5 rounded-[3rem] border border-white/10 shadow-2xl">
+                                            <img src={CONFIG_SITE.imagens.black_dash} className="rounded-[2.5rem] opacity-90 w-full grayscale hover:grayscale-0 transition-all duration-1000" alt="Black Dash" />
                                          </div>
                                     </div>
                                 </div>
                             </div>
                         </section>
 
-                        {/* HARDWARE E MÉTRICAS TÁTICAS */}
+                        {/* HARDWARE */}
                         <section className="py-24 md:py-44 bg-white overflow-hidden text-left">
-                            <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-32 items-center text-left">
-                                <div className="text-left order-2 lg:order-1 text-left">
-                                    <span className="text-orange font-black uppercase text-[10px] mb-6 block tracking-[0.5em] italic text-left">Hardware Industrial</span>
-                                    <h2 className="text-navy text-5xl md:text-7xl font-black mb-12 tracking-tighter leading-none text-left uppercase italic text-left">Hardware que <br/>Antecipa o Risco.</h2>
-                                    <p className="text-slate-500 mb-14 text-left leading-relaxed text-xl font-medium text-left">Processamos comportamentos em milissegundos através de hardware militar certificado IP67.</p>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-16 text-left">
-                                        <div className="border-l-4 border-slate-100 pl-8 group hover:border-orange transition-all text-left"><Icon name="cpu" size={32} className="text-orange mb-6" /><h4 className="text-navy font-black text-lg uppercase mb-2 text-left">Processamento</h4><p className="text-slate-400 text-sm font-medium text-left">Quad-Core de alta performance para vídeo.</p></div>
-                                        <div className="border-l-4 border-slate-100 pl-8 group hover:border-orange transition-all text-left"><Icon name="wifi" size={32} className="text-orange mb-6" /><h4 className="text-navy font-black text-lg uppercase mb-2 text-left">Conectividade</h4><p className="text-slate-400 text-sm font-medium text-left">Módulo 5G/4G pronto para áreas críticas.</p></div>
+                            <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-32 items-center">
+                                <div className="text-left order-2 lg:order-1">
+                                    <span className="text-orange font-black uppercase text-[10px] mb-6 block tracking-[0.5em] italic">Hardware Industrial</span>
+                                    <h2 className="text-navy text-5xl md:text-7xl font-black mb-12 tracking-tighter leading-none uppercase italic">Hardware que <br/>Antecipa o Risco.</h2>
+                                    <p className="text-slate-500 mb-14 leading-relaxed text-xl font-medium">Processamos comportamentos em milissegundos através de hardware militar certificado IP67.</p>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-16">
+                                        <div className="border-l-4 border-slate-100 pl-8 group hover:border-orange transition-all"><Icon name="cpu" size={32} className="text-orange mb-6" /><h4 className="text-navy font-black text-lg uppercase mb-2">Processamento</h4><p className="text-slate-400 text-sm font-medium">Quad-Core para processamento de vídeo.</p></div>
+                                        <div className="border-l-4 border-slate-100 pl-8 group hover:border-orange transition-all"><Icon name="wifi" size={32} className="text-orange mb-6" /><h4 className="text-navy font-black text-lg uppercase mb-2">Conectividade</h4><p className="text-slate-400 text-sm font-medium">Módulo 5G/4G pronto para áreas críticas.</p></div>
                                     </div>
                                 </div>
-                                <div className="relative order-1 lg:order-2 text-left">
-                                    <div className="rounded-[4.5rem] overflow-hidden shadow-2xl border-[20px] border-slate-50 relative group text-left">
-                                        <img src={CONFIG_SITE.imagens.hardware_metrics} className="w-full grayscale hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-105 text-left" />
+                                <div className="relative order-1 lg:order-2">
+                                    <div className="rounded-[4.5rem] overflow-hidden shadow-2xl border-[20px] border-slate-50 group">
+                                        <img src={CONFIG_SITE.imagens.hardware_metrics} className="w-full grayscale group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-105" alt="Hardware Metrics" />
                                         <div className="absolute bottom-10 left-10 right-10 bg-navy/95 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white/10 flex justify-between items-center text-white opacity-0 group-hover:opacity-100 transition-all duration-700 shadow-2xl text-left">
                                             <div className="flex items-center gap-4 text-left">
-                                                <div className="w-4 h-4 rounded-full bg-green-500 animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.5)] text-left"></div>
-                                                <div className="text-left"><p class="text-[10px] font-black uppercase opacity-50 tracking-widest leading-none text-left">STATUS DO SISTEMA</p><p class="text-sm font-black mt-2 uppercase text-left">99.9% ONLINE</p></div>
+                                                <div className="w-4 h-4 rounded-full bg-green-500 animate-pulse shadow-[0_0_15px_rgba(34,197,94,0.5)]"></div>
+                                                <div className="text-left">
+                                                    <p className="text-[10px] font-black uppercase opacity-50 tracking-widest leading-none">STATUS DO SISTEMA</p>
+                                                    <p className="text-sm font-black mt-2 uppercase">99.9% ONLINE</p>
+                                                </div>
                                             </div>
-                                            <div className="text-right text-orange text-right"><p class="text-[10px] font-black uppercase opacity-50 tracking-widest leading-none text-right">LATÊNCIA</p><p class="text-sm font-black mt-2 text-orange uppercase text-right">0.1ms</p></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* PLAYER DO YOUTUBE RESTAURADO */}
-                        <section className="py-24 bg-white text-center">
-                            <div className="max-w-6xl mx-auto px-6 text-center">
-                                <div className="text-center mb-16 text-center">
-                                    <span className="text-orange font-black tracking-[0.4em] uppercase text-[10px] mb-6 block italic text-center text-center">Demonstração</span>
-                                    <h2 className="text-navy text-4xl md:text-6xl font-black tracking-tighter text-center leading-tight text-center">Sinta a Tecnologia.</h2>
-                                </div>
-                                <div onClick={() => setIsVideoOpen(true)} className="relative rounded-[2.5rem] md:rounded-[4rem] overflow-hidden shadow-2xl group cursor-pointer border-[8px] md:border-[16px] border-slate-50 text-center">
-                                    <div className="aspect-video w-full bg-navy relative group overflow-hidden text-center">
-                                        <img src={CONFIG_SITE.imagens.video_thumbnail} className="w-full h-full object-cover grayscale-[0.2] group-hover:scale-105 group-hover:grayscale-0 transition-all duration-1000 opacity-60 text-center" />
-                                        <div className="absolute inset-0 flex items-center justify-center text-center">
-                                            <div className="w-24 h-24 md:w-32 md:h-32 bg-orange rounded-full flex items-center justify-center text-white play-button-ring transition-all group-hover:scale-110 text-center">
-                                                <Icon name="play" size={40} className="fill-current ml-2 text-center" />
+                                            <div className="text-right text-orange">
+                                                <p className="text-[10px] font-black uppercase opacity-50 tracking-widest leading-none">LATÊNCIA</p>
+                                                <p className="text-sm font-black mt-2 text-orange uppercase">0.1ms</p>
                                             </div>
                                         </div>
                                     </div>
@@ -545,69 +660,96 @@
                             </div>
                         </section>
 
-                        {/* GRADE DE ESTATÍSTICAS */}
-                        <section className="py-24 md:py-32 bg-navy relative overflow-hidden text-center">
-                            <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-12 text-center relative z-10 text-center">
+                        {/* VIDEO PRINCIPAL */}
+                        <section className="py-24 bg-slate-50 text-center">
+                            <div className="max-w-6xl mx-auto px-6">
+                                <div className="text-center mb-16">
+                                    <span className="text-orange font-black tracking-[0.4em] uppercase text-[10px] mb-6 block italic">Demonstração</span>
+                                    <h2 className="text-navy text-4xl md:text-6xl font-black tracking-tighter leading-tight">Sinta a Tecnologia.</h2>
+                                </div>
+                                <div onClick={() => setIsVideoOpen(true)} className="relative rounded-[2.5rem] md:rounded-[4rem] overflow-hidden shadow-2xl group cursor-pointer border-[8px] md:border-[16px] border-white">
+                                    <div className="aspect-video w-full bg-navy relative overflow-hidden">
+                                        <img src={CONFIG_SITE.imagens.video_thumbnail} className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-1000" alt="Video Thumbnail" />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="w-24 h-24 md:w-32 md:h-32 bg-orange rounded-full flex items-center justify-center text-white play-button-ring transition-all group-hover:scale-110">
+                                                <Icon name="play" size={40} className="fill-current ml-2" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ESTATÍSTICAS */}
+                        <section className="py-24 md:py-32 bg-deepNavy relative overflow-hidden text-center">
+                            <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 lg:grid-cols-4 gap-12 relative z-10 text-center">
                                 {[
                                     { n: "+50k", l: "Ativos Monitorados", i: "truck" },
                                     { n: "1.5k+", l: "Empresas Parceiras", i: "building-2" },
                                     { n: "24/7", l: "Controle Tático VIP", i: "clock" },
                                     { n: "-30%", l: "Custos Reduzidos", i: "trending-down" }
                                 ].map((s, i) => (
-                                    <div key={i} className="group cursor-default text-center">
-                                        <div className="text-orange mb-6 flex justify-center text-center"><Icon name={s.i} size={36} className="text-center" /></div>
-                                        <div className="text-5xl md:text-7xl font-black text-white italic mb-4 group-hover:scale-110 transition-transform duration-500 leading-none text-center">{s.n}</div>
-                                        <div className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 leading-relaxed text-center">{s.l}</div>
+                                    <div key={i} className="group">
+                                        <div className="text-orange mb-6 flex justify-center"><Icon name={s.i} size={36} /></div>
+                                        <div className="text-5xl md:text-7xl font-black text-white italic mb-4 transition-transform leading-none">{s.n}</div>
+                                        <div className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 leading-relaxed uppercase">{s.l}</div>
                                     </div>
                                 ))}
                             </div>
                         </section>
                     </main>
 
-                    {/* RODAPÉ PREMIUM (RESTAURADO COMPLETO) */}
-                    <footer id="footer" className="bg-[#001D2E] text-white pt-32 pb-16 text-left border-t border-white/5">
-                        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
+                    {/* RODAPÉ */}
+                    <footer id="footer" className="bg-deepNavy text-white pt-32 pb-16 text-left border-t border-white/5">
+                        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16 mb-24 text-left">
                             <div className="space-y-10">
                                 <div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.scrollTo(0,0)}>
-                                    <div 
-                                        className="bg-white/5 rounded-2xl text-orange group-hover:bg-orange group-hover:text-navy transition-all shadow-lg flex items-center justify-center overflow-hidden"
-                                        style={{ width: CONFIG_SITE.imagens.logo_largura_footer, height: CONFIG_SITE.imagens.logo_altura_footer }}
-                                    >
+                                    <div className="bg-white/5 rounded-2xl text-orange flex items-center justify-center overflow-hidden" style={{ width: CONFIG_SITE.imagens.logo_largura_footer, height: CONFIG_SITE.imagens.logo_altura_footer }}>
                                         {CONFIG_SITE.imagens.logo ? <img src={CONFIG_SITE.imagens.logo} alt="Logo" className="w-full h-full object-contain" /> : <Icon name="camera" />}
                                     </div>
                                     <span className="text-3xl font-black tracking-tighter uppercase italic">INTER<span className="text-orange">TRANK</span></span>
                                 </div>
-                                <p className="text-white/30 text-sm italic leading-relaxed max-w-xs text-left">"Redefinindo os limites da segurança industrial através da inteligência de dados inabalável."</p>
                                 <div className="flex gap-5">
                                     {['linkedin', 'instagram', 'facebook'].map(s => (
-                                        <a key={s} href={CONFIG_SITE.redes_sociais[s]} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 hover:bg-orange hover:text-navy transition-all shadow-xl text-center">
-                                            <Icon name={s} size={20} className="text-center" />
+                                        <a key={s} href={CONFIG_SITE.redes_sociais[s]} target="_blank" className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 hover:bg-orange hover:text-navy transition-all shadow-xl">
+                                            <Icon name={s} size={20} />
                                         </a>
                                     ))}
                                 </div>
                             </div>
-                            <div><h4 className="text-orange text-[11px] font-black uppercase mb-10 tracking-[0.5em] italic">Plataforma</h4><ul className="space-y-5 text-sm font-bold text-white/40"><li><button onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">Início</button></li><li><button onClick={() => openInfo('servicos')} className="hover:text-white transition-colors">Serviços</button></li><li><button onClick={() => openInfo('etica')} className="hover:text-white transition-colors">Canal de Ética</button></li></ul></div>
-                            <div><h4 className="text-orange text-[11px] font-black uppercase mb-10 tracking-[0.5em] italic">Empresa</h4><ul className="space-y-5 text-sm font-bold text-white/40"><li><button onClick={() => openInfo('sobre')} className="hover:text-white transition-colors">Sobre a Marca</button></li><li><button onClick={() => openInfo('trabalhe')} className="hover:text-white transition-colors">Trabalhe Conosco</button></li><li><button onClick={() => openInfo('contato')} className="hover:text-white transition-colors">Consultoria VIP</button></li></ul></div>
-                            <div><h4 className="text-orange text-[11px] font-black uppercase mb-10 tracking-[0.5em] italic">Legal</h4><ul className="space-y-5 text-sm font-bold text-white/40"><li><button onClick={() => openInfo('privacidade')} className="hover:text-white transition-colors">Privacidade</button></li><li><button onClick={() => openInfo('lgpd')} className="hover:text-white transition-colors">LGPD</button></li><li><button onClick={() => openInfo('termos')} className="hover:text-white transition-colors">Termos de Uso</button></li></ul></div>
+                            <div><h4 className="text-orange text-[11px] font-black uppercase mb-10 tracking-[0.5em] italic text-left">Navegação</h4><ul className="space-y-5 text-sm font-bold text-white/40 text-left"><li><button onClick={() => window.scrollTo(0,0)} className="hover:text-white transition-colors">Início</button></li><li><button onClick={() => handleNav('Galeria')} className="hover:text-white transition-colors">Galeria Técnica</button></li><li><button onClick={() => openInfo('etica')} className="hover:text-white transition-colors">Canal de Ética</button></li></ul></div>
+                            <div><h4 className="text-orange text-[11px] font-black uppercase mb-10 tracking-[0.5em] italic text-left">Empresa</h4><ul className="space-y-5 text-sm font-bold text-white/40 text-left"><li><button onClick={() => openInfo('sobre')} className="hover:text-white transition-colors">Sobre Nós</button></li><li><button onClick={() => openInfo('trabalhe')} className="hover:text-white transition-colors">Trabalhe Conosco</button></li><li><button onClick={() => openInfo('contato')} className="hover:text-white transition-colors">Consultoria VIP</button></li></ul></div>
+                            <div><h4 className="text-orange text-[11px] font-black uppercase mb-10 tracking-[0.5em] italic text-left">Legal</h4><ul className="space-y-5 text-sm font-bold text-white/40 text-left"><li><button onClick={() => openInfo('privacidade')} className="hover:text-white transition-colors">Privacidade</button></li><li><button onClick={() => openInfo('lgpd')} className="hover:text-white transition-colors">LGPD</button></li><li><button onClick={() => openInfo('termos')} className="hover:text-white transition-colors">Termos de Uso</button></li></ul></div>
                         </div>
                         <div className="pt-16 border-t border-white/5 text-center">
-                            <div className="flex items-center justify-center gap-4 group cursor-default">
-                                <Icon name="shield-check" className="text-orange" size={24} />
-                                <span className="text-xl font-black text-white/40 tracking-tighter uppercase">LGPD</span>
-                            </div>
-                            <p className="mt-8 text-[9px] font-black uppercase tracking-[0.8em] text-white/10 italic">© 2024 INTERTRANK | Engenharia Logística Industrial de Alta Precisão</p>
+                            <p className="text-[9px] font-black uppercase tracking-[0.8em] text-white/10 italic">© 2024 INTERTRANK | Engenharia Logística Industrial</p>
                         </div>
                     </footer>
 
                     {/* BOTÃO FLUTUANTE */}
-                    <button onClick={() => setIsPlanosOpen(true)}  className="fixed bottom-6 right-6 z-[40] bg-orange hover:bg-navy text-white p-4 md:px-6 md:py-4 rounded-2xl md:rounded-3xl shadow-2xl flex items-center gap-3 transition-all transform hover:scale-105 group">
+                    <button onClick={() => setIsPlanosOpen(true)} className="fixed bottom-6 right-6 z-[40] bg-orange hover:bg-navy text-white p-4 md:px-6 md:py-4 rounded-2xl md:rounded-3xl shadow-2xl flex items-center gap-3 transition-all transform hover:scale-105 group">
                         <Icon name="tag" size={24} />
-                        <span className="hidden sm:block">Ver Planos</span>
+                        <span className="hidden sm:block font-black uppercase tracking-widest text-[10px]">Ver Planos</span>
                     </button>
 
+                    {/* PORTAL DE MODAIS */}
                     <ModalPlanos isOpen={isPlanosOpen} onClose={() => setIsPlanosOpen(false)} />
                     <ModalInformativo isOpen={infoModal.isOpen} onClose={() => setInfoModal({ ...infoModal, isOpen: false })} title={infoModal.title} content={infoModal.content} icon={infoModal.icon} />
                     <ModalVideo isOpen={isVideoOpen} onClose={() => setIsVideoOpen(false)} />
+                    
+                    {/* MODAIS DE GALERIA */}
+                    <ModalGradeGaleria 
+                        isOpen={isGridGalleryOpen} 
+                        onClose={() => setIsGridGalleryOpen(false)} 
+                        items={CONFIG_SITE.galeria} 
+                        onSelectItem={(idx) => setLightboxState({ isOpen: true, index: idx })}
+                    />
+                    <ModalGaleriaLightbox 
+                        isOpen={lightboxState.isOpen} 
+                        onClose={() => setLightboxState({ ...lightboxState, isOpen: false })} 
+                        items={CONFIG_SITE.galeria} 
+                        startIndex={lightboxState.index} 
+                    />
                 </div>
             );
         };
